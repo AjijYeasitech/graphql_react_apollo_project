@@ -1,29 +1,28 @@
 import { useState } from "react";
 import { FilterIcon, ReturnIcon, SearchIcon } from "../../../svg";
-import axios from "axios";
 import { useSelector } from "react-redux";
+import { useLazyQuery, useQuery } from "@apollo/client";
+import { GET_SEARCH_USER } from "../../../dataFetchQuery/user.query";
 
 export default function Search({ searchLength, setSearchResults }) {
-  const USER_ENDPOINT = "http://localhost:/8000/api/v1";
-
   const { user } = useSelector((state) => state.user);
   const { token } = user;
   const [show, setShow] = useState(false);
+  const [searchUser, { loading, error, data }] = useLazyQuery(GET_SEARCH_USER, {
+    context: {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  });
 
-  const handleSearch = async (e) => {
+  const HandleSearch = async (e) => {
     if (e.target.value && e.key === "Enter") {
       try {
-        const { data } = await axios.get(
-          `http://localhost:8000/api/v1/user?search=${e.target.value}`,
-
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const { data } = await searchUser({
+          variables: { searchParam: e.target.value },
+        });
         setSearchResults(data);
-        // console.log("data",data);
       } catch (error) {
         console.log(error.response.data.error.message);
       }
@@ -56,7 +55,7 @@ export default function Search({ searchLength, setSearchResults }) {
               className="input"
               onFocus={() => setShow(true)}
               onBlur={() => searchLength === 0 && setShow(false)}
-              onKeyDown={(e) => handleSearch(e)}
+              onKeyDown={(e) => HandleSearch(e)}
             ></input>
           </div>
           <button className="btn">

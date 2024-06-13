@@ -1,7 +1,4 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { useQuery, useMutation } from "@apollo/client";
-import { REGISTER_USER_MUTATION } from "../dataFetchQuery/user.query";
-import { useEffect } from "react";
 
 const initialState = {
   status: "",
@@ -19,10 +16,9 @@ const initialState = {
 // Api call by using createAsyncThunk & useMutation hook:
 export const registerUser = createAsyncThunk(
   "user/register",
-  async ({ loading, userError, data }, { rejectWithValue }) => {
+  async ({ loading, error, data }, { rejectWithValue }) => {
     try {
-      if (loading == false && data) return data;
-      // console.log("loading, userError, data ", loading, userError, data);
+      return { loading, error, data };
     } catch (error) {
       console.log("error");
       return rejectWithValue(error);
@@ -68,18 +64,19 @@ export const userSlice = createSlice({
       // for register user
       .addCase(registerUser.pending, (state, action) => {
         state.status = "loading";
+        // state.status = action.meta.arg.loading;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.user = action.payload.createUser.data; // user from backend
+        state.user = action.payload.data.createUser.data; // user from backend
       })
       .addCase(registerUser.rejected, (state, action) => {
+        console.log("active.reject", action);
         state.status = "failed";
-        state.error = action.payload;
+        state.error = action.payload.error;
       })
       // login user
       .addCase(loginUser.fulfilled, (state, action) => {
-        console.log("action", action);
         state.status = "succeeded";
         state.user = action.payload.userSignIn; // user from backend
         // state.user.token=action.payload.access_token

@@ -5,7 +5,11 @@ import AuthInput from "./AuthInput.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import PulseLoader from "react-spinners/PulseLoader";
 import { Link, useNavigate } from "react-router-dom";
-import { changeStatus, registerUser } from "../../features/userSlice.js";
+import {
+  changeStatus,
+  registerUser,
+  useLazyGraphqlMutation,
+} from "../../features/userSlice.js";
 import { useState } from "react";
 import Picture from "./Picture";
 import axios from "axios";
@@ -40,10 +44,8 @@ export default function RegisterForm() {
       const { data } = await createUser({
         variables: { input: { ...userData } },
       });
-
       let res = await dispatch(registerUser({ loading, userError, data }));
-      console.log("res", res);
-      if (res?.payload?.createUser?.data) {
+      if (res?.payload?.data.createUser?.data) {
         navigate("/");
       }
     } catch (error) {

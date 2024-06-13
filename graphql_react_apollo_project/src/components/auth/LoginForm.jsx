@@ -13,7 +13,6 @@ export default function LoginForm() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state?.user);
-  console.log("user", user);
 
   const {
     register,
@@ -26,18 +25,13 @@ export default function LoginForm() {
   );
 
   const onSubmit = async (values) => {
-    // console.log("values", values);
     const { data } = await userSignIn({
       variables: { ...values },
     });
-    // console.log("data", data);
     let res = await dispatch(loginUser({ loading, userError, data }));
-    console.log("res", res);
-
-    // if (res?.payload?.user) {
-    //   console.log("loginform");
-    //   navigate("/");
-    // }
+    if (res.payload.userSignIn) {
+      navigate("/");
+    }
   };
   return (
     <div className="min-h-screen w-full flex items-center justify-center overflow-hidden">

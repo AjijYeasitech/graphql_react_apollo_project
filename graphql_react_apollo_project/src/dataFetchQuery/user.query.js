@@ -48,3 +48,17 @@ export const GET_USERS = gql`
     }
   }
 `;
+
+export const GET_SEARCH_USER = gql`
+  query SearchUser($searchParam: String) {
+    searchUser(searchParam: $searchParam) {
+      id
+      email
+      name
+      picture
+      status
+      isActive
+      createdAt
+    }
+  }
+`;
